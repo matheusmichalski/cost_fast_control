@@ -53,14 +53,26 @@ function clearAll() {
 
 <template>
     <main class="bg-[#f4f4f4] max-w-300 my-0 mx-auto min-h-screen">
-        <header class="p-6 bg-green-500 border-b border-[#ddd] text-white">
-            <h1 class="text-2xl font-bold">Controle de Gastos Rápido</h1>
-            <div>
-                <button class="small-btn" @click="filter = 'all'">Tudo</button>
-                <button class="small-btn" @click="filter = 'food'">Comida</button>
-                <button class="small-btn" @click="filter = 'transport'">Transporte</button>
-                <button class="small-btn" @click="filter = 'other'">Outros</button>
-            </div>
+        <header class="p-6 pb-3 bg-green-500 border-b border-[#ddd] text-white">
+            <h1 class="text-2xl font-semibold">Controle de Gastos Rápido</h1>
+            <nav class="flex items-center gap-4 mt-3 text-black font-semibold text-sm">
+                <button :class="[
+                    'px-3 py-1 rounded-2xl cursor-pointer duration-300',
+                    filter === 'all' ? 'bg-white text-green-600' : 'text-white hover:bg-green-600'
+                ]" @click="filter = 'all'">Tudo</button>
+                <button :class="[
+                    'px-3 py-1 rounded-2xl cursor-pointer duration-300',
+                    filter === 'food' ? 'bg-white text-green-600' : 'text-white hover:bg-green-600'
+                ]" @click="filter = 'food'">Comida</button>
+                <button :class="[
+                    'px-3 py-1 rounded-2xl cursor-pointer duration-300',
+                    filter === 'transport' ? 'bg-white text-green-600' : 'text-white hover:bg-green-600'
+                ]" @click="filter = 'transport'">Transporte</button>
+                <button :class="[
+                    'px-3 py-1 rounded-2xl cursor-pointer duration-300',
+                    filter === 'other' ? 'bg-white text-green-600' : 'text-white hover:bg-green-600'
+                ]" @click="filter = 'other'">Outros</button>
+            </nav>
         </header>
 
         <div class="mt-5 border border-[#ccc] p-6 shadow-xl rounded-2xl w-[90%] mx-auto">
@@ -72,7 +84,7 @@ function clearAll() {
             <h2 class="text-xl font-bold mb-2">Lista do dia</h2>
             <ul class="grid gap-3">
                 <li v-for="item in filtered" :key="item.id"
-                    class="flex items-center justify-between bg-white py-3 px-5 rounded-2xl shadow-lg hover:-translate-y-1 duration-300 cursor-pointer border border-transparent hover:border-green-500">
+                    class="flex items-center justify-between bg-white py-3 px-5 rounded-2xl shadow-lg hover:-translate-y-1 duration-300 cursor-pointer border border-transparent hover:border-green-500 active:border-green-500 active:-translate-y-1">
                     <div class="flex items-center gap-3">
                         <span class="material-symbols-outlined p-2 bg-[#ccc]/50 rounded-lg">coffee</span>
                         <div>
@@ -83,7 +95,7 @@ function clearAll() {
                     <div class="flex items-center gap-3">
                         <p class="font-semibold text-lg">R$ {{ item.value }}</p>
                         <button @click="removeExpense(item.id)"
-                            class="material-symbols-outlined p-2 bg-[#ccc]/50 rounded-lg">close</button>
+                            class="material-symbols-outlined p-2 bg-[#ccc]/50 rounded-lg cursor-pointer">close</button>
                     </div>
                 </li>
             </ul>
