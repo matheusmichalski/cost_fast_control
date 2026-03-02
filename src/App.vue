@@ -1,58 +1,3 @@
-<template>
-    <div class="app">
-        <div class="header">
-            <h1>Controle de Gastos Rapido</h1>
-            <div>
-                <button class="small-btn" @click="filter = 'all'">Tudo</button>
-                <button class="small-btn" @click="filter = 'food'">Comida</button>
-                <button class="small-btn" @click="filter = 'transport'">Transporte</button>
-                <button class="small-btn" @click="filter = 'other'">Outros</button>
-            </div>
-        </div>
-
-        <div class="layout">
-            <div class="panel">
-                <h2>Nova despesa</h2>
-                <input v-model="title" class="input" placeholder="Descricao" />
-                <input v-model="value" class="input" placeholder="Valor" />
-                <input v-model="category" class="input" placeholder="Categoria" />
-                <div class="row">
-                    <button class="small-btn" @click="addExpense">Add</button>
-                    <button class="small-btn" @click="clearAll">Limpar tudo</button>
-                </div>
-            </div>
-
-            <div class="panel">
-                <h2>Lista do dia</h2>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Descricao</th>
-                            <th>Categoria</th>
-                            <th>Valor</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in filtered" :key="item.id">
-                            <td>{{ item.title }}</td>
-                            <td>{{ item.category }}</td>
-                            <td>{{ item.value }}</td>
-                            <td>
-                                <button class="small-btn" @click="removeExpense(item.id)">X</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="summary">
-                    Total do dia: {{ total }}
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-
 <script setup>
 import { computed, ref } from 'vue';
 
@@ -105,3 +50,79 @@ function clearAll() {
     expenses.value = [];
 }
 </script>
+
+<template>
+    <main class="bg-[#f4f4f4] max-w-300 my-0 mx-auto min-h-screen">
+        <header class="p-6 bg-green-500 border-b border-[#ddd] text-white">
+            <h1 class="text-2xl font-bold">Controle de Gastos Rápido</h1>
+            <div>
+                <button class="small-btn" @click="filter = 'all'">Tudo</button>
+                <button class="small-btn" @click="filter = 'food'">Comida</button>
+                <button class="small-btn" @click="filter = 'transport'">Transporte</button>
+                <button class="small-btn" @click="filter = 'other'">Outros</button>
+            </div>
+        </header>
+
+        <div class="mt-5 border border-[#ccc] p-6 shadow-xl rounded-2xl w-[90%] mx-auto">
+            <p class="text-[#555] text-lg font-semibold">Resumo de Saldo:</p>
+            <span class="font-bold text-2xl">R$ {{ total }}</span>
+        </div>
+
+        <div class="p-6">
+            <h2 class="text-xl font-bold mb-2">Lista do dia</h2>
+            <ul class="grid gap-3">
+                <li v-for="item in filtered" :key="item.id"
+                    class="flex items-center justify-between bg-white py-3 px-5 rounded-2xl shadow-lg hover:-translate-y-1 duration-300 cursor-pointer border border-transparent hover:border-green-500">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined p-2 bg-[#ccc]/50 rounded-lg">coffee</span>
+                        <div>
+                            <p class="font-semibold text-lg">{{ item.title }}</p>
+                            <p>{{ item.category }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <p class="font-semibold text-lg">R$ {{ item.value }}</p>
+                        <button @click="removeExpense(item.id)"
+                            class="material-symbols-outlined p-2 bg-[#ccc]/50 rounded-lg">close</button>
+                    </div>
+                </li>
+            </ul>
+            <!-- <table class="w-full text-sm border-collapse">
+                <thead>
+                    <tr>
+                        <th class="border border-[#eee] p-1.5 text-left">Descricao</th>
+                        <th class="border border-[#eee] p-1.5 text-left">Categoria</th>
+                        <th class="border border-[#eee] p-1.5 text-left">Valor</th>
+                        <th class="border border-[#eee] p-1.5 text-left"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in filtered" :key="item.id">
+                        <td class="border border-[#eee] p-1.5 text-left">{{ item.title }}</td>
+                        <td class="border border-[#eee] p-1.5 text-left">{{ item.category }}</td>
+                        <td class="border border-[#eee] p-1.5 text-left">{{ item.value }}</td>
+                        <td class="border border-[#eee] p-1.5 text-left">
+                            <button class="small-btn" @click="removeExpense(item.id)">X</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table> -->
+        </div>
+
+        <!-- <div class="panel">
+                <h2>Nova despesa</h2>
+                <input v-model="title" class="input" placeholder="Descricao" />
+                <input v-model="value" class="input" placeholder="Valor" />
+                <input v-model="category" class="input" placeholder="Categoria" />
+                <div class="row">
+                    <button class="small-btn" @click="addExpense">Add</button>
+                    <button class="small-btn" @click="clearAll">Limpar tudo</button>
+                </div>
+            </div> -->
+
+        <button
+            class="material-symbols-outlined fixed bottom-5 right-5 bg-green-500 text-white rounded-full p-4 text-2xl shadow-lg">
+            add
+        </button>
+    </main>
+</template>
