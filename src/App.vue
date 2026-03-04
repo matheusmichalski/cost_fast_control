@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
+import AddItem from './components/addItem.vue';
 
 const expenses = ref([
     { id: 1, title: 'Cafe', value: 6, category: 'food' },
@@ -7,10 +8,12 @@ const expenses = ref([
     { id: 3, title: 'Lanche', value: 12, category: 'food' },
 ]);
 
-const title = ref('');
-const value = ref('');
-const category = ref('');
 const filter = ref('all');
+const showPopup = ref(false);
+
+const togglePopup = () => {
+    showPopup.value = !showPopup.value;
+};
 
 const filtered = computed(() => {
     if (filter.value === 'all') {
@@ -23,31 +26,8 @@ const total = computed(() => {
     return expenses.value.reduce((sum, item) => sum + Number(item.value || 0), 0);
 });
 
-function addExpense() {
-    if (!title.value.trim() || !value.value.trim()) {
-        alert('Preencha tudo');
-        return;
-    }
-    expenses.value.push({
-        id: Date.now(),
-        title: title.value,
-        value: value.value,
-        category: category.value || 'other',
-    });
-    title.value = '';
-    value.value = '';
-    category.value = '';
-}
-
 function removeExpense(id) {
     expenses.value = expenses.value.filter((item) => item.id !== id);
-}
-
-function clearAll() {
-    if (!confirm('Tem certeza?')) {
-        return;
-    }
-    expenses.value = [];
 }
 </script>
 
@@ -99,42 +79,13 @@ function clearAll() {
                     </div>
                 </li>
             </ul>
-            <!-- <table class="w-full text-sm border-collapse">
-                <thead>
-                    <tr>
-                        <th class="border border-[#eee] p-1.5 text-left">Descricao</th>
-                        <th class="border border-[#eee] p-1.5 text-left">Categoria</th>
-                        <th class="border border-[#eee] p-1.5 text-left">Valor</th>
-                        <th class="border border-[#eee] p-1.5 text-left"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="item in filtered" :key="item.id">
-                        <td class="border border-[#eee] p-1.5 text-left">{{ item.title }}</td>
-                        <td class="border border-[#eee] p-1.5 text-left">{{ item.category }}</td>
-                        <td class="border border-[#eee] p-1.5 text-left">{{ item.value }}</td>
-                        <td class="border border-[#eee] p-1.5 text-left">
-                            <button class="small-btn" @click="removeExpense(item.id)">X</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table> -->
         </div>
 
-        <!-- <div class="panel">
-                <h2>Nova despesa</h2>
-                <input v-model="title" class="input" placeholder="Descricao" />
-                <input v-model="value" class="input" placeholder="Valor" />
-                <input v-model="category" class="input" placeholder="Categoria" />
-                <div class="row">
-                    <button class="small-btn" @click="addExpense">Add</button>
-                    <button class="small-btn" @click="clearAll">Limpar tudo</button>
-                </div>
-            </div> -->
-
         <button
-            class="material-symbols-outlined fixed bottom-5 right-5 bg-green-500 text-white rounded-full p-4 text-2xl shadow-lg">
+            class="material-symbols-outlined fixed bottom-5 right-5 bg-green-500 text-white rounded-full p-4 text-2xl shadow-lg"
+            @click="togglePopup">
             add
         </button>
+        <AddItem v-if="showPopup" @close="showPopup = false" />
     </main>
 </template>
