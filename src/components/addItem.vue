@@ -49,7 +49,8 @@ const handleOverlayClick = (event) => {
         <div class="max-w-sm rounded-lg bg-white shadow-lg overflow-hidden">
             <div class="flex justify-between text-white bg-green-500 p-3 mb-5">
                 <h2 class="font-semibold">Adicionar novo gasto</h2>
-                <button class="material-symbols-outlined cursor-pointer" @click="emit('close')">close</button>
+                <button class="material-symbols-outlined cursor-pointer active:scale-97 duration-300"
+                    @click="emit('close')">close</button>
             </div>
 
             <div class="m-5">
@@ -84,7 +85,7 @@ const handleOverlayClick = (event) => {
                 </div>
 
                 <button
-                    class="w-full bg-green-500 text-white font-semibold py-2.5 rounded-3xl mt-5 cursor-pointer active:scale-97 duration-300"
+                    class="w-full bg-green-500 text-white font-semibold py-2.5 rounded-3xl mt-5 cursor-pointer hover:bg-green-600 active:bg-green-700 active:scale-97 duration-300"
                     @click="addExpense">Salvar Gasto</button>
             </div>
         </div>

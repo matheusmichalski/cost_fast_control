@@ -82,7 +82,7 @@ function removeExpense(id) {
         </div>
 
         <button
-            class="material-symbols-outlined fixed bottom-5 right-5 bg-green-500 text-white rounded-full p-4 text-2xl shadow-lg"
+            class="material-symbols-outlined fixed bottom-5 right-5 bg-green-500 text-white rounded-full p-4 text-2xl shadow-lg cursor-pointer hover:bg-green-600 active:bg-green-700 active:scale-97 duration-300"
             @click="togglePopup">
             add
         </button>
