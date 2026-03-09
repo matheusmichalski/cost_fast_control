@@ -59,7 +59,7 @@ const handleOverlayClick = (event) => {
                 <label for="value" class="text-lg font-bold">Amount</label>
                 <p class="flex gap-1.5 text-2xl font-bold mb-5">
                     $
-                    <input id="value" type="text" inputmode="decimal" placeholder="0,00"
+                    <input id="value" type="text" inputmode="decimal" placeholder="0.00"
                         class="text-2xl font-bold bg-transparent border-none outline-none placeholder:text-black"
                         :value="value" @input="formatAmountInput" />
                 </p>
