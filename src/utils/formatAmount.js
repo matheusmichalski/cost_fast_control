@@ -34,15 +34,15 @@ export const parseAmount = (rawValue) => {
 };
 
 export const formatAmount = (value) => {
-  const formatter = new Intl.NumberFormat("pt-BR", {
+  const formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "BRL",
+    currency: "USD",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
   if (typeof value !== "number" || !Number.isFinite(value)) {
-    return "R$ 0,00";
+    return "US 0,00";
   }
   return formatter.format(value);
 };

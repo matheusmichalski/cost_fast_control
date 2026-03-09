@@ -1,6 +1,5 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { useToast } from 'vue-toastification';
 import { sanitizeAmountInput } from '../utils/formatAmount';
 import { useItemsStore } from '../store/items';
 
@@ -8,19 +7,13 @@ const title = ref('');
 const value = ref('');
 const category = ref('other');
 const isCategoryOpen = ref(false);
+const { allowedCategories } = useItemsStore()
 
 const emit = defineEmits(['close']);
-const toast = useToast();
 const { addItem } = useItemsStore();
 
-const categoryOptions = [
-    { value: 'food', label: 'Food', icon: '☕' },
-    { value: 'transport', label: 'Transport', icon: '🚌' },
-    { value: 'other', label: 'Other', icon: '📦' },
-];
-
 const selectedCategoryLabel = computed(() => {
-    return categoryOptions.find((option) => option.value === category.value)?.label || 'Select category...';
+    return allowedCategories.find((option) => option.value === category.value)?.label || 'Select category...';
 });
 
 function selectCategory(selectedCategory) {
@@ -32,7 +25,6 @@ function formatAmountInput(event) {
     value.value = sanitizeAmountInput(event.target.value);
 }
 
-
 function handleAddItem() {
     const result = addItem({
         title: title.value,
@@ -40,12 +32,6 @@ function handleAddItem() {
         category: category.value,
     });
 
-    if (!result.ok) {
-        toast.error(result.error);
-        return;
-    }
-
-    toast.success('Item added successfully.');
     title.value = '';
     value.value = '';
     category.value = 'other';
@@ -72,7 +58,7 @@ const handleOverlayClick = (event) => {
             <div class="m-5">
                 <label for="value" class="text-lg font-bold">Amount</label>
                 <p class="flex gap-1.5 text-2xl font-bold mb-5">
-                    R$
+                    $
                     <input id="value" type="text" inputmode="decimal" placeholder="0,00"
                         class="text-2xl font-bold bg-transparent border-none outline-none placeholder:text-black"
                         :value="value" @input="formatAmountInput" />
@@ -95,9 +81,10 @@ const handleOverlayClick = (event) => {
 
                     <div
                         :class="['w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-lg duration-300', isCategoryOpen ? '' : 'opacity-0 pointer-events-none absolute']">
-                        <div v-for="option in categoryOptions" :key="option.value" @click="selectCategory(option.value)"
+                        <div v-for="option in allowedCategories" :key="option.value"
+                            @click="selectCategory(option.value)"
                             class="px-4 py-3 hover:bg-gray-50 flex items-center gap-3 cursor-pointer border-b border-gray-50 last:border-b-0">
-                            <span>{{ option.icon }}</span>
+                            <span class="material-symbols-outlined">{{ option.icon }}</span>
                             <span class="text-gray-700">{{ option.label }}</span>
                         </div>
                     </div>

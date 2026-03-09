@@ -1,18 +1,40 @@
-import { ref, computed } from "vue";
+import { ref, reactive, computed } from "vue";
 import { defineStore } from "pinia";
 import { parseAmount } from "../utils/formatAmount";
 
 export const useItemsStore = defineStore("items", () => {
-  const allowedCategories = ["food", "transport", "other"];
+  const allowedCategories = reactive([
+    { value: "food", label: "Food", icon: "food_bank" },
+    { value: "transport", label: "Transport", icon: "local_taxi" },
+    { value: "other", label: "Other", icon: "more_horiz" },
+  ]);
 
   const items = ref([
-    { id: 1, title: "Cafe", value: 6, category: "food" },
-    { id: 2, title: "Onibus", value: 4.5, category: "transport" },
-    { id: 3, title: "Lanche", value: 12, category: "food" },
+    { id: 1, title: "Coffe", value: 6, category: "food", icon: "food_bank" },
+    {
+      id: 2,
+      title: "Bus",
+      value: 4.5,
+      category: "transport",
+      icon: "local_taxi",
+    },
+    {
+      id: 3,
+      title: "Breakfast",
+      value: 12,
+      category: "food",
+      icon: "food_bank",
+    },
+    {
+      id: 4,
+      title: "Shoppe",
+      value: 24.9,
+      category: "other",
+      icon: "more_horiz",
+    },
   ]);
 
   const filter = ref("all");
-  const showPopup = ref(false);
 
   const filteredItems = computed(() => {
     if (filter.value === "all") {
@@ -29,14 +51,6 @@ export const useItemsStore = defineStore("items", () => {
     filter.value = category;
   };
 
-  const togglePopup = () => {
-    showPopup.value = !showPopup.value;
-  };
-
-  const closePopup = () => {
-    showPopup.value = false;
-  };
-
   const removeItem = (id) => {
     items.value = items.value.filter((item) => item.id !== id);
   };
@@ -44,9 +58,9 @@ export const useItemsStore = defineStore("items", () => {
   const addItem = (item) => {
     const title = String(item?.title ?? "").trim();
     const amount = parseAmount(item?.value);
-    const category = allowedCategories.includes(item?.category)
-      ? item.category
-      : "other";
+    const categoryData =
+      allowedCategories.find((c) => c.value === item?.category) ||
+      allowedCategories.find((c) => c.value === "other");
 
     if (!title) {
       return { ok: false, error: "Title is required." };
@@ -60,7 +74,8 @@ export const useItemsStore = defineStore("items", () => {
       id: item.id ?? Date.now(),
       title,
       value: amount,
-      category,
+      category: categoryData.value,
+      icon: categoryData.icon,
     });
 
     return { ok: true };
@@ -69,13 +84,10 @@ export const useItemsStore = defineStore("items", () => {
   return {
     items,
     filter,
-    showPopup,
     filteredItems,
     total,
     allowedCategories,
     setFilter,
-    togglePopup,
-    closePopup,
     removeItem,
     addItem,
   };
