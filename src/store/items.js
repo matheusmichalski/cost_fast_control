@@ -1,5 +1,6 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
+import { parseAmount } from "../utils/formatAmount";
 
 export const useItemsStore = defineStore("items", () => {
   const allowedCategories = ["food", "transport", "other"];
@@ -40,40 +41,9 @@ export const useItemsStore = defineStore("items", () => {
     items.value = items.value.filter((item) => item.id !== id);
   };
 
-  const normalizeAmount = (rawValue) => {
-    const sanitized = String(rawValue ?? "")
-      .trim()
-      .replace(/[^\d.,]/g, "");
-
-    if (!sanitized) {
-      return null;
-    }
-
-    const lastComma = sanitized.lastIndexOf(",");
-    const lastDot = sanitized.lastIndexOf(".");
-    const decimalSeparator = lastComma > lastDot ? "," : ".";
-
-    let normalized = sanitized;
-
-    if (lastComma !== -1 || lastDot !== -1) {
-      const thousandsSeparator = decimalSeparator === "," ? /\./g : /,/g;
-      normalized = sanitized
-        .replace(thousandsSeparator, "")
-        .replace(decimalSeparator, ".");
-    }
-
-    const amount = Number.parseFloat(normalized);
-
-    if (!Number.isFinite(amount) || amount <= 0) {
-      return null;
-    }
-
-    return amount;
-  };
-
   const addItem = (item) => {
     const title = String(item?.title ?? "").trim();
-    const amount = normalizeAmount(item?.value);
+    const amount = parseAmount(item?.value);
     const category = allowedCategories.includes(item?.category)
       ? item.category
       : "other";

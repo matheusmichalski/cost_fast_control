@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useToast } from 'vue-toastification';
+import { sanitizeAmountInput } from '../utils/formatAmount';
 import { useItemsStore } from '../store/items';
 
 const title = ref('');
@@ -18,15 +19,17 @@ const categoryOptions = [
     { value: 'other', label: 'Other', icon: '📦' },
 ];
 
+const selectedCategoryLabel = computed(() => {
+    return categoryOptions.find((option) => option.value === category.value)?.label || 'Select category...';
+});
+
 function selectCategory(selectedCategory) {
     category.value = selectedCategory;
     isCategoryOpen.value = false;
 }
 
 function formatAmountInput(event) {
-    value.value = event.target.value
-        .replace(/[^\d.,]/g, '')
-        .replace(/(,.*),/g, '$1');
+    value.value = sanitizeAmountInput(event.target.value);
 }
 
 
@@ -84,7 +87,7 @@ const handleOverlayClick = (event) => {
                     <div @click="isCategoryOpen = !isCategoryOpen"
                         class="flex justify-between w-full border border-gray-400 bg-gray-100 text-sm rounded-xl px-3 py-2 my-2 focus:outline-green-500 outline-transparent text-black/60">
                         <p class="text-black/60 font-medium mt-0.5">
-                            {{ categoryOptions.find((option) => option.value === category)?.label || 'Select category...' }}
+                            {{ selectedCategoryLabel }}
                         </p>
                         <span
                             :class="['material-symbols-outlined duration-300', isCategoryOpen ? 'rotate-180' : '']">keyboard_arrow_down</span>
