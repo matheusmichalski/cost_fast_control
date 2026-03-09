@@ -32,3 +32,17 @@ export const parseAmount = (rawValue) => {
 
   return amount;
 };
+
+export const formatAmount = (value) => {
+  const formatter = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return "R$ 0,00";
+  }
+  return formatter.format(value);
+};

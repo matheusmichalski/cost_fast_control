@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import AddItem from './components/addItem.vue';
 
 import { useItemsStore } from './store/items';
+import { formatAmount } from './utils/formatAmount';
 
 const itemsStore = useItemsStore();
 const { items, filter, showPopup, filteredItems, total } = storeToRefs(itemsStore);
@@ -41,7 +42,7 @@ onMounted(() => {
 
         <div class="mt-5 border border-[#ccc] p-6 shadow-xl rounded-2xl w-[90%] mx-auto">
             <p class="text-[#555] text-lg font-semibold">Resumo de Saldo:</p>
-            <span class="font-bold text-2xl">R$ {{ total }}</span>
+            <span class="font-bold text-2xl">{{ formatAmount(total) }}</span>
         </div>
 
         <div class="p-6">
@@ -57,7 +58,7 @@ onMounted(() => {
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <p class="font-semibold text-lg">R$ {{ item.value }}</p>
+                        <p class="font-semibold text-lg">{{ formatAmount(item.value) }}</p>
                         <button @click="removeItem(item.id)"
                             class="material-symbols-outlined p-2 bg-[#ccc]/50 rounded-lg cursor-pointer">close</button>
                     </div>
