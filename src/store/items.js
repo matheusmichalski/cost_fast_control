@@ -2,6 +2,8 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 
 export const useItemsStore = defineStore("items", () => {
+  const allowedCategories = ["food", "transport", "other"];
+
   const items = ref([
     { id: 1, title: "Cafe", value: 6, category: "food" },
     { id: 2, title: "Onibus", value: 4.5, category: "transport" },
@@ -38,13 +40,60 @@ export const useItemsStore = defineStore("items", () => {
     items.value = items.value.filter((item) => item.id !== id);
   };
 
+  const normalizeAmount = (rawValue) => {
+    const sanitized = String(rawValue ?? "")
+      .trim()
+      .replace(/[^\d.,]/g, "");
+
+    if (!sanitized) {
+      return null;
+    }
+
+    const lastComma = sanitized.lastIndexOf(",");
+    const lastDot = sanitized.lastIndexOf(".");
+    const decimalSeparator = lastComma > lastDot ? "," : ".";
+
+    let normalized = sanitized;
+
+    if (lastComma !== -1 || lastDot !== -1) {
+      const thousandsSeparator = decimalSeparator === "," ? /\./g : /,/g;
+      normalized = sanitized
+        .replace(thousandsSeparator, "")
+        .replace(decimalSeparator, ".");
+    }
+
+    const amount = Number.parseFloat(normalized);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return null;
+    }
+
+    return amount;
+  };
+
   const addItem = (item) => {
+    const title = String(item?.title ?? "").trim();
+    const amount = normalizeAmount(item?.value);
+    const category = allowedCategories.includes(item?.category)
+      ? item.category
+      : "other";
+
+    if (!title) {
+      return { ok: false, error: "Title is required." };
+    }
+
+    if (amount === null) {
+      return { ok: false, error: "Enter a valid amount greater than zero." };
+    }
+
     items.value.push({
       id: item.id ?? Date.now(),
-      title: item.title,
-      value: item.value,
-      category: item.category || "other",
+      title,
+      value: amount,
+      category,
     });
+
+    return { ok: true };
   };
 
   return {
@@ -53,6 +102,7 @@ export const useItemsStore = defineStore("items", () => {
     showPopup,
     filteredItems,
     total,
+    allowedCategories,
     setFilter,
     togglePopup,
     closePopup,
