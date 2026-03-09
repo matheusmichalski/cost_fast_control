@@ -1,46 +1,48 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { sanitizeAmountInput } from '../utils/formatAmount';
+import { useItemsStore } from '../store/items';
 
 const title = ref('');
 const value = ref('');
-const category = ref('');
-const isOpen = ref(false);
-const emit = defineEmits(['close'])
+const category = ref('other');
+const isCategoryOpen = ref(false);
+const { allowedCategories } = useItemsStore()
 
-function addExpense() {
-    if (!title.value.trim() || !value.value.trim()) {
-        alert('Preencha tudo');
-        return;
-    }
-    expenses.value.push({
-        id: Date.now(),
+const emit = defineEmits(['close']);
+const { addItem } = useItemsStore();
+
+const selectedCategoryLabel = computed(() => {
+    return allowedCategories.find((option) => option.value === category.value)?.label || 'Select category...';
+});
+
+function selectCategory(selectedCategory) {
+    category.value = selectedCategory;
+    isCategoryOpen.value = false;
+}
+
+function formatAmountInput(event) {
+    value.value = sanitizeAmountInput(event.target.value);
+}
+
+function handleAddItem() {
+    const result = addItem({
         title: title.value,
         value: value.value,
-        category: category.value || 'other',
+        category: category.value,
     });
+
     title.value = '';
     value.value = '';
-    category.value = '';
+    category.value = 'other';
     emit('close');
-}
-
-function selectOption(option) {
-    category.value = option;
-    isOpen.value = false;
-}
-
-function clearAll() {
-    if (!confirm('Tem certeza?')) {
-        return;
-    }
-    expenses.value = [];
 }
 
 const handleOverlayClick = (event) => {
     if ((event.target).id === 'overlay') {
-        emit('close')
+        emit('close');
     }
-}
+};
 </script>
 
 <template>
@@ -48,45 +50,49 @@ const handleOverlayClick = (event) => {
         class="fixed inset-0 z-20 flex items-center justify-center bg-black/80">
         <div class="max-w-sm rounded-lg bg-white shadow-lg overflow-hidden">
             <div class="flex justify-between text-white bg-green-500 p-3 mb-5">
-                <h2 class="font-semibold">Adicionar novo gasto</h2>
+                <h2 class="font-semibold">Add New Expense</h2>
                 <button class="material-symbols-outlined cursor-pointer active:scale-97 duration-300"
                     @click="emit('close')">close</button>
             </div>
 
             <div class="m-5">
-                <label for="value" class="text-lg font-bold">Qual foi o valor?</label>
+                <label for="value" class="text-lg font-bold">Amount</label>
                 <p class="flex gap-1.5 text-2xl font-bold mb-5">
-                    R$
-                    <input type="tel" placeholder="0,00"
+                    $
+                    <input id="value" type="text" inputmode="decimal" placeholder="0,00"
                         class="text-2xl font-bold bg-transparent border-none outline-none placeholder:text-black"
-                        v-model="value" onfocus="this.value = ''" />
+                        :value="value" @input="formatAmountInput" />
                 </p>
 
-                <h3 class="font-semibold text-sm">Descrição</h3>
+                <h3 class="font-semibold text-sm">Description</h3>
                 <input v-model="title"
                     class="w-full border border-gray-400 bg-gray-100 text-sm rounded-xl px-3 py-2 my-2 focus:outline-green-500 outline-transparent text-black/60"
-                    placeholder="Ex: Almoço" />
+                    placeholder="Ex: Lunch" />
 
                 <div class="relative w-full my-2">
-                    <div @click="isOpen = !isOpen"
+                    <div @click="isCategoryOpen = !isCategoryOpen"
                         class="flex justify-between w-full border border-gray-400 bg-gray-100 text-sm rounded-xl px-3 py-2 my-2 focus:outline-green-500 outline-transparent text-black/60">
-                        <p class="text-black/60 font-medium mt-0.5">{{ category != '' ? category : 'Selecione...' }}</p>
+                        <p class="text-black/60 font-medium mt-0.5">
+                            {{ selectedCategoryLabel }}
+                        </p>
                         <span
-                            :class="['material-symbols-outlined duration-300', isOpen ? 'rotate-180' : '']">keyboard_arrow_down</span>
+                            :class="['material-symbols-outlined duration-300', isCategoryOpen ? 'rotate-180' : '']">keyboard_arrow_down</span>
                     </div>
 
                     <div
-                        :class="['w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-lg duration-300', isOpen ? '' : 'opacity-0 pointer-events-none absolute']">
-                        <div @click="selectOption('food')"
-                            class="px-4 py-3 hover:bg-gray-50 flex items-center gap-3 cursor-pointer border-b border-gray-50">
-                            <span>☕</span> <span class="text-gray-700">Comida</span>
+                        :class="['w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-lg duration-300', isCategoryOpen ? '' : 'opacity-0 pointer-events-none absolute']">
+                        <div v-for="option in allowedCategories" :key="option.value"
+                            @click="selectCategory(option.value)"
+                            class="px-4 py-3 hover:bg-gray-50 flex items-center gap-3 cursor-pointer border-b border-gray-50 last:border-b-0">
+                            <span class="material-symbols-outlined">{{ option.icon }}</span>
+                            <span class="text-gray-700">{{ option.label }}</span>
                         </div>
                     </div>
                 </div>
 
                 <button
                     class="w-full bg-green-500 text-white font-semibold py-2.5 rounded-3xl mt-5 cursor-pointer hover:bg-green-600 active:bg-green-700 active:scale-97 duration-300"
-                    @click="addExpense">Salvar Gasto</button>
+                    @click="handleAddItem">Save Expense</button>
             </div>
         </div>
     </div>
