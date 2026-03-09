@@ -1,19 +1,19 @@
 <script setup>
 import { ref } from 'vue';
+import { useItemsStore } from '../store/items';
 
 const title = ref('');
 const value = ref('');
 const category = ref('');
-const isOpen = ref(false);
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close']);
+const { addItem } = useItemsStore();
 
 function addExpense() {
     if (!title.value.trim() || !value.value.trim()) {
         alert('Preencha tudo');
         return;
     }
-    expenses.value.push({
-        id: Date.now(),
+    addItem({
         title: title.value,
         value: value.value,
         category: category.value || 'other',
@@ -24,23 +24,11 @@ function addExpense() {
     emit('close');
 }
 
-function selectOption(option) {
-    category.value = option;
-    isOpen.value = false;
-}
-
-function clearAll() {
-    if (!confirm('Tem certeza?')) {
-        return;
-    }
-    expenses.value = [];
-}
-
 const handleOverlayClick = (event) => {
     if ((event.target).id === 'overlay') {
-        emit('close')
+        emit('close');
     }
-}
+};
 </script>
 
 <template>

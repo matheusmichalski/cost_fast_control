@@ -1,34 +1,18 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 import AddItem from './components/addItem.vue';
 
-const expenses = ref([
-    { id: 1, title: 'Cafe', value: 6, category: 'food' },
-    { id: 2, title: 'Onibus', value: 4.5, category: 'transport' },
-    { id: 3, title: 'Lanche', value: 12, category: 'food' },
-]);
+import { useItemsStore } from './store/items';
 
-const filter = ref('all');
-const showPopup = ref(false);
+const itemsStore = useItemsStore();
+const { items, filter, showPopup, filteredItems, total } = storeToRefs(itemsStore);
+const { setFilter, togglePopup, closePopup, removeItem } = itemsStore;
 
-const togglePopup = () => {
-    showPopup.value = !showPopup.value;
-};
 
-const filtered = computed(() => {
-    if (filter.value === 'all') {
-        return expenses.value;
-    }
-    return expenses.value.filter((item) => item.category === filter.value);
+onMounted(() => {
+    console.log('Component montado, itens:', items.value);
 });
-
-const total = computed(() => {
-    return expenses.value.reduce((sum, item) => sum + Number(item.value || 0), 0);
-});
-
-function removeExpense(id) {
-    expenses.value = expenses.value.filter((item) => item.id !== id);
-}
 </script>
 
 <template>
@@ -39,19 +23,19 @@ function removeExpense(id) {
                 <button :class="[
                     'px-3 py-1 rounded-2xl cursor-pointer duration-300',
                     filter === 'all' ? 'bg-white text-green-600' : 'text-white hover:bg-green-600'
-                ]" @click="filter = 'all'">Tudo</button>
+                ]" @click="setFilter('all')">Tudo</button>
                 <button :class="[
                     'px-3 py-1 rounded-2xl cursor-pointer duration-300',
                     filter === 'food' ? 'bg-white text-green-600' : 'text-white hover:bg-green-600'
-                ]" @click="filter = 'food'">Comida</button>
+                ]" @click="setFilter('food')">Comida</button>
                 <button :class="[
                     'px-3 py-1 rounded-2xl cursor-pointer duration-300',
                     filter === 'transport' ? 'bg-white text-green-600' : 'text-white hover:bg-green-600'
-                ]" @click="filter = 'transport'">Transporte</button>
+                ]" @click="setFilter('transport')">Transporte</button>
                 <button :class="[
                     'px-3 py-1 rounded-2xl cursor-pointer duration-300',
                     filter === 'other' ? 'bg-white text-green-600' : 'text-white hover:bg-green-600'
-                ]" @click="filter = 'other'">Outros</button>
+                ]" @click="setFilter('other')">Outros</button>
             </nav>
         </header>
 
@@ -63,7 +47,7 @@ function removeExpense(id) {
         <div class="p-6">
             <h2 class="text-xl font-bold mb-2">Lista do dia</h2>
             <ul class="grid gap-3">
-                <li v-for="item in filtered" :key="item.id"
+                <li v-for="item in filteredItems" :key="item.id"
                     class="flex items-center justify-between bg-white py-3 px-5 rounded-2xl shadow-lg hover:-translate-y-1 duration-300 cursor-pointer border border-transparent hover:border-green-500 active:border-green-500 active:-translate-y-1">
                     <div class="flex items-center gap-3">
                         <span class="material-symbols-outlined p-2 bg-[#ccc]/50 rounded-lg">coffee</span>
@@ -74,7 +58,7 @@ function removeExpense(id) {
                     </div>
                     <div class="flex items-center gap-3">
                         <p class="font-semibold text-lg">R$ {{ item.value }}</p>
-                        <button @click="removeExpense(item.id)"
+                        <button @click="removeItem(item.id)"
                             class="material-symbols-outlined p-2 bg-[#ccc]/50 rounded-lg cursor-pointer">close</button>
                     </div>
                 </li>
@@ -86,6 +70,6 @@ function removeExpense(id) {
             @click="togglePopup">
             add
         </button>
-        <AddItem v-if="showPopup" @close="showPopup = false" />
+        <AddItem v-if="showPopup" @close="closePopup" />
     </main>
 </template>
